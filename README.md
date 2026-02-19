@@ -24,6 +24,16 @@ Visit http://localhost:5000 to view the interactive dashboard.
 ### 3. View Excel Dashboard
 Open `Netflix_Content_Strategy_Dashboard.xlsx` in Excel.
 
+## Deployment
+
+### Deploy to Vercel (Free & Easy)
+
+This app is ready for one-click deployment on Vercel:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Shlokabhishek/data_analytics_1st-project)
+
+Or follow the [detailed deployment guide](VERCEL_DEPLOYMENT.md).
+
 ## Project Structure
 
 ```

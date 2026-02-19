@@ -1,6 +1,7 @@
 """
 Netflix Content Strategy Dashboard - Web Application
 Flask-based interactive dashboard
+Deployable on Vercel, Heroku, or any WSGI server
 """
 
 from flask import Flask, render_template, jsonify
