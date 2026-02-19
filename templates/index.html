@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Content Strategy Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d0a0e 100%);
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(90deg, #e50914 0%, #b20710 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(229, 9, 20, 0.3);
+        }
+        
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(229, 9, 20, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #e50914;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .page-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .page-title {
+            font-size: 2em;
+            margin-bottom: 25px;
+            color: #e50914;
+            border-bottom: 3px solid #e50914;
+            padding-bottom: 10px;
+        }
+        
+        .chart-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+            height: 400px;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .insights-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .insight-item {
+            background: rgba(229, 9, 20, 0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #e50914;
+            transition: all 0.3s ease;
+        }
+        
+        .insight-item:hover {
+            background: rgba(229, 9, 20, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.5em;
+        }
+        
+        .risk-factors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .risk-card {
+            background: rgba(255, 193, 7, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .recommendation-card {
+            background: rgba(76, 175, 80, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid #4caf50;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            opacity: 0.7;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📺 NETFLIX CONTENT STRATEGY DASHBOARD</h1>
+            <p class="subtitle">Data-Driven Investment Intelligence & Market Analysis</p>
+        </header>
+        
+        <!-- Summary Statistics -->
+        <div id="summary-stats" class="stats-grid">
+            <div class="loading">Loading statistics...</div>
+        </div>
+        
+        <!-- Page 1: Content Distribution Intelligence -->
+        <div class="page-section">
+            <h2 class="page-title">📊 PAGE 1: Content Distribution Intelligence</h2>
+            <div class="grid-2">
+                <div class="chart-container">
+                    <canvas id="typeChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="genreChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container" style="height: 500px;">
+                <canvas id="countryChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Page 2: Content Lifecycle Trends -->
+        <div class="page-section">
+            <h2 class="page-title">📈 PAGE 2: Content Lifecycle Trends</h2>
+            <div class="chart-container" style="height: 450px;">
+                <canvas id="yearlyChart"></canvas>
+            </div>
+            <div class="grid-2">
+                <div class="chart-container">
+                    <canvas id="ratingChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="durationChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page 3: Saturation & Opportunity Analysis -->
+        <div class="page-section">
+            <h2 class="page-title">🎯 PAGE 3: Saturation & Opportunity Analysis</h2>
+            <div class="grid-2">
+                <div class="chart-container">
+                    <canvas id="saturationChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="opportunityChart"></canvas>
+                </div>
+            </div>
+            <div id="market-insights">
+                <div class="loading">Loading market analysis...</div>
+            </div>
+        </div>
+        
+        <!-- Page 4: 3-Year Investment Plan -->
+        <div class="page-section">
+            <h2 class="page-title">💼 PAGE 4: 3-Year Investment Plan Simulation</h2>
+            <div id="investment-plan">
+                <div class="loading">Loading investment recommendations...</div>
+            </div>
+            <div class="risk-factors" id="risk-factors">
+                <div class="loading">Loading risk analysis...</div>
+            </div>
+        </div>
+        
+        <!-- Key Insights -->
+        <div class="page-section">
+            <h2 class="page-title">💡 KEY INSIGHTS & FINDINGS</h2>
+            <ul id="insights-list" class="insights-list">
+                <div class="loading">Loading insights...</div>
+            </ul>
+        </div>
+        
+        <footer>
+            <p>&copy; 2026 Netflix Content Strategy Dashboard | Data Analytics Reverse Learning Project</p>
+            <p>Built with Python, Flask, and Chart.js</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Fetch and display summary statistics
+        fetch('/api/summary')
+            .then(response => response.json())
+            .then(data => {
+                const statsContainer = document.getElementById('summary-stats');
+                statsContainer.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-value">${data.total_titles.toLocaleString()}</div>
+                        <div class="stat-label">Total Titles</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${data.movies.toLocaleString()}</div>
+                        <div class="stat-label">Movies</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${data.tv_shows.toLocaleString()}</div>
+                        <div class="stat-label">TV Shows</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${data.countries}</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${Math.round(data.avg_movie_duration)}</div>
+                        <div class="stat-label">Avg Movie (min)</div>
+                    </div>
+                `;
+            });
+        
+        // Fetch and display content distribution
+        fetch('/api/content-distribution')
+            .then(response => response.json())
+            .then(data => {
+                // Type distribution pie chart
+                const typeCtx = document.getElementById('typeChart').getContext('2d');
+                new Chart(typeCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(data.type_distribution),
+                        datasets: [{
+                            data: Object.values(data.type_distribution),
+                            backgroundColor: ['#e50914', '#221f1f'],
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Movies vs TV Shows',
+                                color: '#fff',
+                                font: { size: 18 }
+                            },
+                            legend: {
+                                labels: { color: '#fff', font: { size: 14 } }
+                            }
+                        }
+                    }
+                });
+                
+                // Genre distribution bar chart
+                const genreCtx = document.getElementById('genreChart').getContext('2d');
+                const genreLabels = Object.keys(data.genre_distribution).slice(0, 10);
+                const genreValues = Object.values(data.genre_distribution).slice(0, 10);
+                
+                new Chart(genreCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: genreLabels,
+                        datasets: [{
+                            label: 'Number of Titles',
+                            data: genreValues,
+                            backgroundColor: '#e50914',
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Top 10 Genres',
+                                color: '#fff',
+                                font: { size: 18 }
+                            },
+                            legend: {
+                                labels: { color: '#fff' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            y: {
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+                
+                // Country distribution bar chart
+                const countryCtx = document.getElementById('countryChart').getContext('2d');
+                const countryLabels = Object.keys(data.country_distribution).slice(0, 15);
+                const countryValues = Object.values(data.country_distribution).slice(0, 15);
+                
+                new Chart(countryCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: countryLabels,
+                        datasets: [{
+                            label: 'Number of Titles',
+                            data: countryValues,
+                            backgroundColor: '#564d4d',
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Top 15 Content Producing Countries',
+                                color: '#fff',
+                                font: { size: 18 }
+                            },
+                            legend: {
+                                labels: { color: '#fff' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            y: {
+                                ticks: { color: '#fff', font: { size: 11 } },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            });
+        
+        // Fetch and display lifecycle trends
+        fetch('/api/lifecycle-trends')
+            .then(response => response.json())
+            .then(data => {
+                // Yearly releases line chart
+                const yearlyCtx = document.getElementById('yearlyChart').getContext('2d');
+                new Chart(yearlyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.yearly_releases.years,
+                        datasets: [
+                            {
+                                label: 'Movies',
+                                data: data.yearly_releases.movies,
+                                borderColor: '#e50914',
+                                backgroundColor: 'rgba(229, 9, 20, 0.2)',
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'TV Shows',
+                                data: data.yearly_releases.tv_shows,
+                                borderColor: '#221f1f',
+                                backgroundColor: 'rgba(34, 31, 31, 0.2)',
+                                fill: true,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Content Release Trend by Year',
+                                color: '#fff',
+                                font: { size: 18 }
+                            },
+                            legend: {
+                                labels: { color: '#fff' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            y: {
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+                
+                // Rating distribution
+                const ratingCtx = document.getElementById('ratingChart').getContext('2d');
+                new Chart(ratingCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(data.rating_distribution),
+                        datasets: [{
+                            data: Object.values(data.rating_distribution),
+                            backgroundColor: [
+                                '#e50914', '#b20710', '#831010', '#564d4d',
+                                '#ffc107', '#4caf50', '#2196f3', '#9c27b0',
+                                '#ff5722', '#795548'
+                            ],
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Rating Distribution',
+                                color: '#fff',
+                                font: { size: 18 }
+                            },
+                            legend: {
+                                labels: { color: '#fff', font: { size: 11 } },
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+                
+                // Duration stats
+                const durationCtx = document.getElementById('durationChart').getContext('2d');
+                const durationStats = data.movie_duration_stats;
+                new Chart(durationCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Min', 'Mean', 'Median', 'Max'],
+                        datasets: [{
+                            label: 'Movie Duration (minutes)',
+                            data: [
+                                durationStats.min,
+                                durationStats.mean,
+                                durationStats.median,
+                                durationStats.max
+                            ],
+                            backgroundColor: ['#4caf50', '#e50914', '#ffc107', '#2196f3'],
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Movie Duration Statistics',
+                                color: '#fff',
+                                font: { size: 18 }
+                            },
+                            legend: {
+                                labels: { color: '#fff' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            });
+        
+        // Fetch and display saturation analysis
+        fetch('/api/saturation-analysis')
+            .then(response => response.json())
+            .then(data => {
+                // Oversaturated genres
+                const saturationCtx = document.getElementById('saturationChart').getContext('2d');
+                new Chart(saturationCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data.oversaturated_genres),
+                        datasets: [{
+                            label: 'Oversaturated Genres',
+                            data: Object.values(data.oversaturated_genres),
+                            backgroundColor: '#ff5722',
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '🔴 Oversaturated Genres',
+                                color: '#fff',
+                                font: { size: 18 }
+                            },
+                            legend: {
+                                labels: { color: '#fff' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#fff', font: { size: 10 } },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+                
+                // Underserved genres (opportunity)
+                const opportunityCtx = document.getElementById('opportunityChart').getContext('2d');
+                new Chart(opportunityCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data.underserved_genres),
+                        datasets: [{
+                            label: 'Underserved Genres',
+                            data: Object.values(data.underserved_genres),
+                            backgroundColor: '#4caf50',
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '🟢 Opportunity Areas',
+                                color: '#fff',
+                                font: { size: 18 }
+                            },
+                            legend: {
+                                labels: { color: '#fff' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#fff', font: { size: 9 } },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+                
+                // Market insights
+                const insightsContainer = document.getElementById('market-insights');
+                let html = '<div class="grid-2">';
+                html += '<div class="recommendation-card"><h3>🟢 Emerging Markets</h3><ul>';
+                for (const [market, count] of Object.entries(data.emerging_markets)) {
+                    html += `<li>${market}: ${count} titles - Growth potential</li>`;
+                }
+                html += '</ul></div>';
+                html += '</div>';
+                insightsContainer.innerHTML = html;
+            });
+        
+        // Fetch and display investment plan
+        fetch('/api/investment-plan')
+            .then(response => response.json())
+            .then(data => {
+                const planContainer = document.getElementById('investment-plan');
+                let html = '<div class="grid-2">';
+                
+                // Proposed genres
+                html += '<div class="recommendation-card">';
+                html += '<h3>📊 Proposed Genre Mix</h3><ul>';
+                for (const [genre, count] of Object.entries(data.proposed_genres)) {
+                    const percentage = (count / Object.values(data.proposed_genres).reduce((a, b) => a + b, 0) * 100).toFixed(1);
+                    html += `<li><strong>${genre}</strong>: ${percentage}% allocation</li>`;
+                }
+                html += '</ul></div>';
+                
+                // Content type mix
+                html += '<div class="recommendation-card">';
+                html += '<h3>🎬 Content Type Strategy</h3><ul>';
+                for (const [type, ratio] of Object.entries(data.content_type_mix)) {
+                    html += `<li><strong>${type}</strong>: ${(ratio * 100).toFixed(1)}%</li>`;
+                }
+                html += '</ul></div>';
+                
+                // Geographic focus
+                html += '<div class="recommendation-card">';
+                html += '<h3>🌍 Geographic Priorities</h3><ul>';
+                for (const [country, count] of Object.entries(data.geographic_focus)) {
+                    html += `<li><strong>${country}</strong>: Priority market</li>`;
+                }
+                html += '</ul></div>';
+                
+                // Rating strategy
+                html += '<div class="recommendation-card">';
+                html += '<h3>🔞 Rating Distribution</h3><ul>';
+                for (const [rating, ratio] of Object.entries(data.rating_mix)) {
+                    html += `<li><strong>${rating}</strong>: ${(ratio * 100).toFixed(1)}%</li>`;
+                }
+                html += '</ul></div>';
+                
+                html += '</div>';
+                planContainer.innerHTML = html;
+                
+                // Risk factors
+                const riskContainer = document.getElementById('risk-factors');
+                riskContainer.innerHTML = `
+                    <div class="risk-card">
+                        <h4>⚠️ Market Saturation</h4>
+                        <p>Oversaturated genres may yield lower ROI</p>
+                    </div>
+                    <div class="risk-card">
+                        <h4>⚠️ Platform Competition</h4>
+                        <p>Intense competition from other streamers</p>
+                    </div>
+                    <div class="risk-card">
+                        <h4>⚠️ Viewer Preferences</h4>
+                        <p>Post-pandemic viewing habits evolution</p>
+                    </div>
+                    <div class="risk-card">
+                        <h4>⚠️ Regulatory Environment</h4>
+                        <p>Regional content regulations vary</p>
+                    </div>
+                    <div class="risk-card">
+                        <h4>⚠️ Production Costs</h4>
+                        <p>Inflation impacting production budgets</p>
+                    </div>
+                    <div class="risk-card">
+                        <h4>⚠️ Technology Shifts</h4>
+                        <p>Emerging viewing technologies and platforms</p>
+                    </div>
+                `;
+            });
+        
+        // Fetch and display insights
+        fetch('/api/insights')
+            .then(response => response.json())
+            .then(data => {
+                const insightsList = document.getElementById('insights-list');
+                let html = '';
+                data.insights.forEach(insight => {
+                    html += `<li class="insight-item">${insight}</li>`;
+                });
+                insightsList.innerHTML = html;
+            });
+    </script>
+</body>
+</html>
