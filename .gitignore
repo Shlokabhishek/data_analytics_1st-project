@@ -5,12 +5,17 @@ __pycache__/
 *.so
 .Python
 .venv/
+.venv-1/
 venv/
 ENV/
+env/
 
 # Excel temp files
 ~$*.xlsx
 ~$*.xls
+
+# Power BI files (large binary files - host on Google Drive instead)
+*.pbix
 
 # IDE
 .vscode/
@@ -19,3 +24,6 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Vercel
+.vercel
