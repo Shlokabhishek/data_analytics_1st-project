@@ -2,32 +2,6 @@
 
 A comprehensive data analysis project featuring both an interactive web dashboard and Excel analytics for Netflix content strategy.
 
-## Features
-
-- **Web Dashboard**: Interactive Flask-based web application with real-time data visualization
-- **Excel Dashboard**: Professional analytics workbook with 9 comprehensive sheets
-- **Data Analysis**: Deep insights into Netflix content trends, genres, and market opportunities
-
-## Quick Start
-
-### 1. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Run Web Dashboard
-```bash
-python app.py
-```
-Visit http://localhost:5000 to view the interactive dashboard.
-
-### 3. View Excel Dashboard
-Open `Netflix_Content_Strategy_Dashboard.xlsx` in Excel.
-
-## Deployment
-
-### Deploy to Vercel (Free & Easy)
-
 This app is ready for one-click deployment on Vercel:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Shlokabhishek/data_analytics_1st-project)
@@ -62,6 +36,3 @@ Or follow the [detailed deployment guide](VERCEL_DEPLOYMENT.md).
 - Matplotlib & Seaborn (Visualization)
 - openpyxl (Excel Integration)
 
-## License
-
-This project is for educational and analytical purposes.
